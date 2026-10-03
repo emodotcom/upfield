@@ -8,14 +8,14 @@
 
 ## Features
 
-- 🌐 HTTP/HTTPS health monitoring with configurable intervals
-- 📊 Uptime percentage & response time history
-- 🔔 Instant alerts via **Telegram** and **Email (SMTP)**
-- 🔁 3-strike rule: alerts after 3 consecutive failures to prevent false positives
-- ✅ Recovery notifications when a service is restored
-- 🐳 Fully Containerized (Docker & Docker Compose)
-- ⚙️ Automated CI/CD pipelines (GitHub Actions)
-- 🔒 Secure environment variable management
+- HTTP/HTTPS health monitoring with configurable intervals
+- Uptime percentage and response time history tracking
+- Instant alerts via Telegram and Email (SMTP)
+- 3-strike rule: alerts after 3 consecutive failures to prevent false positives
+- Recovery notifications when a service is restored
+- Fully Containerized (Docker & Docker Compose)
+- Automated CI/CD pipelines (GitHub Actions)
+- Secure environment variable management
 
 ## Tech Stack
 
