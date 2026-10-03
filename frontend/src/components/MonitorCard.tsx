@@ -1,22 +1,28 @@
-import type { Monitor } from "../types";
+import type { Monitor, MonitorCreate } from "../types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Activity, Clock, Trash2, ExternalLink, Globe } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { EditMonitorModal } from "./EditMonitorModal";
 
 interface MonitorCardProps {
   monitor: Monitor;
   onDelete: (id: number) => void;
   onCheck: (id: number) => void;
+  onEdit: (id: number, payload: Partial<MonitorCreate>) => void;
 }
 
-export function MonitorCard({ monitor, onDelete, onCheck }: MonitorCardProps) {
+export function MonitorCard({ monitor, onDelete, onCheck, onEdit }: MonitorCardProps) {
   const isUp = monitor.current_status === "up";
   const isDown = monitor.current_status === "down";
 
   return (
-    <Card className="hover:shadow-md transition-all duration-200 border-muted">
-      <CardHeader className="pb-2 border-b bg-muted/20">
+    <Card 
+      className={`relative overflow-hidden rounded-xl border border-slate-200/60 dark:border-slate-800/60 shadow-sm transition-all duration-300 hover:shadow-md hover:border-primary/30
+        ${isUp ? 'border-t-[3px] border-t-green-500' : isDown ? 'border-t-[3px] border-t-destructive' : 'border-t-[3px] border-t-muted'}
+      `}
+    >
+      <CardHeader className="pb-2 pt-5">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-3">
             <div className={`p-2 rounded-md ${isUp ? 'bg-green-500/10 text-green-600' : isDown ? 'bg-destructive/10 text-destructive' : 'bg-muted text-muted-foreground'}`}>
@@ -68,15 +74,16 @@ export function MonitorCard({ monitor, onDelete, onCheck }: MonitorCardProps) {
               </span>
               <span className="text-sm font-medium">
                 {monitor.last_checked_at
-                  ? formatDistanceToNow(new Date(monitor.last_checked_at), { addSuffix: true })
+                  ? formatDistanceToNow(new Date(monitor.last_checked_at.endsWith('Z') ? monitor.last_checked_at : monitor.last_checked_at + 'Z'), { addSuffix: true })
                   : "Never"}
               </span>
             </div>
           </div>
-          <div className="flex space-x-2">
+          <div className="flex space-x-1">
             <Button variant="secondary" size="sm" onClick={() => onCheck(monitor.id)}>
               Ping
             </Button>
+            <EditMonitorModal monitor={monitor} onEdit={onEdit} />
             <Button variant="ghost" size="sm" onClick={() => onDelete(monitor.id)} className="text-destructive hover:bg-destructive/10">
               <Trash2 className="h-4 w-4" />
             </Button>

@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .database import Base, engine
-from .routers import checks, monitors
+from .routers import checks, monitors, settings
 from .scheduler import monitor_loop
 
 logging.basicConfig(
@@ -46,6 +46,7 @@ app.add_middleware(
 
 app.include_router(monitors.router)
 app.include_router(checks.router)
+app.include_router(settings.router)
 
 
 @app.get("/health", tags=["System"], summary="Liveness probe")

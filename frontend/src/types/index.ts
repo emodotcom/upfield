@@ -38,3 +38,13 @@ export interface MonitorStats {
   uptime_percentage: number;
   avg_response_time_ms: number | null;
 }
+
+export interface AppSettings {
+  telegram_bot_token?: string;
+  telegram_chat_id?: string;
+  smtp_host: string;
+  smtp_port: number;
+  smtp_user?: string;
+  smtp_pass?: string;
+  alert_email?: string;
+}

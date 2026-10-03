@@ -2,7 +2,7 @@
 
 > Monitor your URLs. Get notified instantly when they go down.
 
-[![CI](https://github.com/YOUR_USERNAME/upfield/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_USERNAME/upfield/actions/workflows/ci.yml)
+[![CI](https://github.com/emodotcom/upfield/actions/workflows/ci.yml/badge.svg)](https://github.com/emodotcom/upfield/actions/workflows/ci.yml)
 
 ---
 
@@ -23,78 +23,55 @@
 |---|---|
 | Backend | Python, FastAPI, SQLAlchemy, aiohttp |
 | Database | SQLite (dev) / PostgreSQL (prod) |
-| Frontend | React, TypeScript, Vite, Tailwind CSS, Recharts |
-| Infrastructure | Docker, nginx, GitHub Actions, Oracle Cloud |
+| Frontend | React, TypeScript, Vite, Tailwind CSS, shadcn/ui |
+| Infrastructure | Docker, GitHub Actions |
 
 ## Getting Started
 
 ### Prerequisites
 - Python 3.12+
-- Docker & Docker Compose (optional)
+- Node.js 20+
+- Docker & Docker Compose (optional for production)
 
-### 1. Clone & configure
+### 1. Clone & Configure
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/upfield.git
+git clone https://github.com/emodotcom/upfield.git
 cd upfield
 cp .env.example .env
 # Edit .env — add your Telegram token and SMTP credentials
 ```
 
-### 2. Run locally (without Docker)
+### 2. Run Locally (Development)
 
+**Start the Backend:**
 ```bash
 cd backend
+python -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
+*API Docs: http://localhost:8000/docs*
 
-Visit **http://localhost:8000/docs** for the interactive API.
+**Start the Frontend:**
+```bash
+cd frontend
+npm install
+npm run dev
+```
+*Dashboard: http://localhost:5173*
 
-### 3. Run with Docker Compose
+### 3. Run with Docker (Production)
 
 ```bash
-docker compose up -d
+docker compose up -d --build
 ```
-
-Backend: **http://localhost:8000**  
-Swagger docs: **http://localhost:8000/docs**
 
 ## Environment Variables
 
 See [`.env.example`](.env.example) for the full list with setup instructions.
 
-Key variables:
-
-| Variable | Description |
-|---|---|
-| `DATABASE_URL` | SQLite (dev) or PostgreSQL connection string |
-| `TELEGRAM_BOT_TOKEN` | From @BotFather |
-| `TELEGRAM_CHAT_ID` | Your Telegram chat/group ID |
-| `SMTP_USER` / `SMTP_PASS` | Gmail credentials (App Password) |
-| `ALERT_EMAIL` | Who receives email alerts |
-
-## API Endpoints
-
-| Method | Path | Description |
-|---|---|---|
-| `GET` | `/monitors/` | List all monitors |
-| `POST` | `/monitors/` | Add a new monitor |
-| `GET` | `/monitors/{id}` | Monitor details |
-| `PUT` | `/monitors/{id}` | Update monitor |
-| `DELETE` | `/monitors/{id}` | Delete monitor |
-| `POST` | `/monitors/{id}/check` | Trigger immediate check |
-| `GET` | `/monitors/{id}/checks` | Check history |
-| `GET` | `/monitors/{id}/stats?days=7` | Uptime stats |
-| `GET` | `/health` | Service liveness |
-
-## Running Tests
-
-```bash
-cd backend
-pytest tests/ -v
-```
-
 ## License
 
-MIT
+This project is licensed under the [MIT License](LICENSE).

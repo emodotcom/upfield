@@ -76,3 +76,26 @@ class MonitorStats(BaseModel):
     successful_checks: int
     uptime_percentage: float
     avg_response_time_ms: Optional[float]
+
+
+# ─── Settings ─────────────────────────────────────────────────────────────────
+
+class SettingsUpdate(BaseModel):
+    telegram_bot_token: Optional[str] = None
+    telegram_chat_id: Optional[str] = None
+    smtp_host: Optional[str] = None
+    smtp_port: Optional[int] = None
+    smtp_user: Optional[str] = None
+    smtp_pass: Optional[str] = None
+    alert_email: Optional[str] = None
+
+class SettingsResponse(BaseModel):
+    telegram_bot_token: Optional[str]
+    telegram_chat_id: Optional[str]
+    smtp_host: str
+    smtp_port: int
+    smtp_user: Optional[str]
+    smtp_pass: Optional[str]
+    alert_email: Optional[str]
+
+    model_config = {"from_attributes": True}

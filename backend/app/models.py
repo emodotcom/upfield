@@ -47,3 +47,16 @@ class Check(Base):
     error_message = Column(String, nullable=True)
 
     monitor = relationship("Monitor", back_populates="checks")
+
+class AppSettings(Base):
+    """Global application settings for notifications."""
+    __tablename__ = "app_settings"
+
+    id = Column(Integer, primary_key=True, index=True)
+    telegram_bot_token = Column(String, nullable=True)
+    telegram_chat_id = Column(String, nullable=True)
+    smtp_host = Column(String, default="smtp.gmail.com")
+    smtp_port = Column(Integer, default=587)
+    smtp_user = Column(String, nullable=True)
+    smtp_pass = Column(String, nullable=True)
+    alert_email = Column(String, nullable=True)

@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { Monitor, MonitorCreate, Check, MonitorStats } from "../types";
+import type { Monitor, MonitorCreate, Check, MonitorStats, AppSettings } from "../types";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:8000",
@@ -53,5 +53,15 @@ export async function fetchStats(
   const { data } = await api.get(`/monitors/${id}/stats`, {
     params: { days },
   });
+  return data;
+}
+
+export async function fetchGlobalSettings(): Promise<AppSettings> {
+  const { data } = await api.get("/settings/");
+  return data;
+}
+
+export async function updateGlobalSettings(payload: Partial<AppSettings>): Promise<AppSettings> {
+  const { data } = await api.put("/settings/", payload);
   return data;
 }
