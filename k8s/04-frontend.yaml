@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: upfield-frontend
+  namespace: upfield
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: upfield-frontend
+  template:
+    metadata:
+      labels:
+        app: upfield-frontend
+    spec:
+      containers:
+      - name: frontend
+        image: ghcr.io/emodotcom/upfield-frontend:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: upfield-frontend
+  namespace: upfield
+spec:
+  selector:
+    app: upfield-frontend
+  ports:
+    - port: 80
+      targetPort: 80

@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: upfield-ingress
+  namespace: upfield
+  annotations:
+    # We will use traefik (K3s default)
+    kubernetes.io/ingress.class: "traefik"
+spec:
+  rules:
+  - host: upfield.sasmazelektronik.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: upfield-frontend
+            port:
+              number: 80
+  - host: api.upfield.sasmazelektronik.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: upfield-backend
+            port:
+              number: 8000

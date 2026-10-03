@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: upfield-backend
+  namespace: upfield
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: upfield-backend
+  template:
+    metadata:
+      labels:
+        app: upfield-backend
+    spec:
+      containers:
+      - name: backend
+        # We will point this to GitHub Container Registry later
+        image: ghcr.io/emodotcom/upfield-backend:latest
+        imagePullPolicy: Always
+        envFrom:
+        - secretRef:
+            name: upfield-secrets
+        ports:
+        - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: upfield-backend
+  namespace: upfield
+spec:
+  selector:
+    app: upfield-backend
+  ports:
+    - port: 8000
+      targetPort: 8000
