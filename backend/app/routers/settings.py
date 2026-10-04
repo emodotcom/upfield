@@ -1,10 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
 
 from ..database import get_db
 from ..models import AppSettings
 from ..schemas import SettingsUpdate, SettingsResponse
 from ..auth import get_current_user
+from ..notifier import send_email
 
 router = APIRouter(
     prefix="/settings", 
@@ -35,3 +36,23 @@ def update_settings(payload: SettingsUpdate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(settings)
     return settings
+
+@router.post("/test-email", summary="Send a test email")
+async def test_email(db: Session = Depends(get_db)):
+    settings = get_or_create_settings(db)
+    if not settings.smtp_host or not settings.smtp_user or not settings.smtp_pass or not settings.alert_email:
+        raise HTTPException(status_code=400, detail="Eksik SMTP ayarları. Lütfen ayarları kaydedip tekrar deneyin.")
+    
+    try:
+        await send_email(
+            to_email=settings.alert_email,
+            subject="🚀 Upfield Bildirim Testi",
+            html_body="<h2>✅ Upfield E-Posta Testi Başarılı!</h2><p>E-posta ayarlarınız doğru şekilde yapılandırılmış. Sistem çöktüğünde e-postalarınız buraya gelecek.</p>",
+            smtp_host=settings.smtp_host,
+            smtp_port=settings.smtp_port,
+            smtp_user=settings.smtp_user,
+            smtp_pass=settings.smtp_pass
+        )
+        return {"status": "success", "message": "Test e-postası başarıyla gönderildi."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"E-posta gönderilemedi: {str(e)}")

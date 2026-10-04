@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import type { AppSettings } from "../types";
-import { fetchGlobalSettings, updateGlobalSettings } from "@/api/client";
+import { fetchGlobalSettings, updateGlobalSettings, testEmail } from "@/api/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,7 @@ import { ChangePasswordModal } from "./ChangePasswordModal";
 export function SettingsModal() {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [testingEmail, setTestingEmail] = useState(false);
   const [formData, setFormData] = useState<Partial<AppSettings>>({
     telegram_bot_token: "",
     telegram_chat_id: "",
@@ -56,6 +57,19 @@ export function SettingsModal() {
       alert("Failed to save settings");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleTestEmail = async () => {
+    try {
+      setTestingEmail(true);
+      await updateGlobalSettings(formData); // Save first to ensure latest settings are used
+      const res = await testEmail();
+      alert(res.message || "Test e-postası başarıyla gönderildi!");
+    } catch (err: any) {
+      alert(err.response?.data?.detail || "E-posta gönderimi başarısız oldu.");
+    } finally {
+      setTestingEmail(false);
     }
   };
 
@@ -156,10 +170,13 @@ export function SettingsModal() {
 
           <div className="flex justify-end space-x-2 pt-4">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-              Cancel
+              İptal
             </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? "Saving..." : "Save Settings"}
+            <Button type="button" variant="secondary" onClick={handleTestEmail} disabled={testingEmail || loading}>
+              {testingEmail ? "Gönderiliyor..." : "E-Posta Test Et"}
+            </Button>
+            <Button type="submit" disabled={loading || testingEmail}>
+              {loading ? "Kaydediliyor..." : "Ayarları Kaydet"}
             </Button>
           </div>
         </form>

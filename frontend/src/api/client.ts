@@ -111,3 +111,8 @@ export async function updateGlobalSettings(payload: Partial<AppSettings>): Promi
   const { data } = await api.put("/settings/", payload);
   return data;
 }
+
+export async function testEmail(): Promise<{ status: string; message: string }> {
+  const { data } = await api.post("/settings/test-email");
+  return data;
+}
