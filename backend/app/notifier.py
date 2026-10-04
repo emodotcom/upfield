@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from datetime import datetime, timezone
 
 import httpx
 import aiosmtplib
@@ -35,21 +36,22 @@ async def send_telegram(chat_id: str, message: str, bot_token: str) -> None:
 
 # ─── Email ────────────────────────────────────────────────────────────────────
 
-async def send_email(to_email: str, subject: str, html_body: str, smtp_host: str, smtp_port: int, smtp_user: str, smtp_pass: str) -> None:
-    """Send an HTML email via SMTP (TLS)."""
+async def send_email(to_email: str, subject: str, text_body: str, html_body: str, smtp_host: str, smtp_port: int, smtp_user: str, smtp_pass: str) -> None:
+    """Send an email with both plain-text and HTML parts via SMTP."""
     if not smtp_user or not smtp_pass or not to_email:
         return
 
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
-    msg["From"] = f"Upfield (No Reply) <{smtp_user}>"
-    msg["Reply-To"] = "noreply@upfield.local"
+    msg["From"] = f"Upfield Notifications <{smtp_user}>"
+    msg["Reply-To"] = smtp_user
     msg["To"] = to_email
+
+    # Adding both plain text and HTML reduces the chance of being marked as SPAM
+    msg.attach(MIMEText(text_body, "plain"))
     msg.attach(MIMEText(html_body, "html"))
 
     try:
-        # Port 465 requires implicit TLS (use_tls=True)
-        # Port 587 requires explicit TLS (start_tls=True)
         use_tls = (smtp_port == 465)
         start_tls = (smtp_port != 465)
 
@@ -64,7 +66,7 @@ async def send_email(to_email: str, subject: str, html_body: str, smtp_host: str
         )
     except Exception as exc:  # noqa: BLE001
         logger.error("Email notification failed: %s", exc)
-        raise exc # Hata yutulmasın, arayüze dönsün
+        raise exc
 
 
 # ─── Dispatcher ───────────────────────────────────────────────────────────────
@@ -72,35 +74,98 @@ async def send_email(to_email: str, subject: str, html_body: str, smtp_host: str
 async def notify(monitor, event: str) -> None:
     """
     Send DOWN or RECOVERY notifications for *monitor*.
-
-    event: "down" | "recovery"
     """
+    time_now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+
     if event == "down":
         tg_msg = (
-            f"🔴 <b>{monitor.name}</b> is <b>DOWN</b>!\n"
-            f"🔗 {monitor.url}\n"
-            f"⚠️ Consecutive failures: {monitor.consecutive_failures}"
+            f"⚠️ <b>[ALERT] Monitor Down</b>\n"
+            f"<b>Name:</b> {monitor.name}\n"
+            f"<b>URL:</b> {monitor.url}\n"
+            f"<b>Failures:</b> {monitor.consecutive_failures}"
         )
-        email_subject = f"🔴 [{monitor.name}] is DOWN"
-        email_body = f"""
-        <h2>🔴 {monitor.name} is DOWN</h2>
-        <p><b>URL:</b> <a href="{monitor.url}">{monitor.url}</a></p>
-        <p><b>Consecutive failures:</b> {monitor.consecutive_failures}</p>
-        <hr>
-        <small>Upfield Health Checker</small>
-        """
+        
+        email_subject = f"[Upfield Alert] Action Required: {monitor.name} is DOWN"
+        
+        text_body = f"""Upfield Monitoring Alert
+
+Monitor Status: DOWN
+Monitor Name: {monitor.name}
+URL: {monitor.url}
+Consecutive Failures: {monitor.consecutive_failures}
+Time: {time_now}
+
+Please check your systems immediately.
+"""
+        html_body = f"""<!DOCTYPE html>
+<html>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #333; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <div style="border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">
+        <div style="background-color: #ef4444; color: #ffffff; padding: 15px 20px; font-weight: bold; font-size: 18px;">
+            Action Required: Monitor Down
+        </div>
+        <div style="padding: 20px;">
+            <p>The following monitor has failed health checks and is currently unreachable.</p>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px;">
+                <tr><td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-weight: bold; width: 35%; color: #64748b;">Monitor Name</td>
+                    <td style="padding: 10px; border-bottom: 1px solid #e2e8f0;">{monitor.name}</td></tr>
+                <tr><td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-weight: bold; color: #64748b;">Target URL</td>
+                    <td style="padding: 10px; border-bottom: 1px solid #e2e8f0;"><a href="{monitor.url}" style="color: #3b82f6; text-decoration: none;">{monitor.url}</a></td></tr>
+                <tr><td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-weight: bold; color: #64748b;">Failures</td>
+                    <td style="padding: 10px; border-bottom: 1px solid #e2e8f0;">{monitor.consecutive_failures} consecutive checks</td></tr>
+                <tr><td style="padding: 10px; font-weight: bold; color: #64748b;">Timestamp</td>
+                    <td style="padding: 10px;">{time_now}</td></tr>
+            </table>
+        </div>
+        <div style="background-color: #f8fafc; padding: 15px 20px; font-size: 12px; color: #64748b; text-align: center; border-top: 1px solid #e2e8f0;">
+            This is an automated message from Upfield Monitoring System.
+        </div>
+    </div>
+</body>
+</html>"""
+
     elif event == "recovery":
         tg_msg = (
-            f"✅ <b>{monitor.name}</b> is back <b>UP</b>!\n"
-            f"🔗 {monitor.url}"
+            f"✅ <b>[RESOLVED] Monitor Up</b>\n"
+            f"<b>Name:</b> {monitor.name}\n"
+            f"<b>URL:</b> {monitor.url}"
         )
-        email_subject = f"✅ [{monitor.name}] recovered"
-        email_body = f"""
-        <h2>✅ {monitor.name} is back UP</h2>
-        <p><b>URL:</b> <a href="{monitor.url}">{monitor.url}</a></p>
-        <hr>
-        <small>Upfield Health Checker</small>
-        """
+        
+        email_subject = f"[Upfield Resolved] Monitor Restored: {monitor.name} is UP"
+        
+        text_body = f"""Upfield Monitoring Alert
+
+Monitor Status: RESOLVED (UP)
+Monitor Name: {monitor.name}
+URL: {monitor.url}
+Time: {time_now}
+
+The monitor is now responding successfully.
+"""
+        html_body = f"""<!DOCTYPE html>
+<html>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #333; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <div style="border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">
+        <div style="background-color: #10b981; color: #ffffff; padding: 15px 20px; font-weight: bold; font-size: 18px;">
+            Status Resolved: Monitor Up
+        </div>
+        <div style="padding: 20px;">
+            <p>The following monitor is now responding successfully to health checks.</p>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px;">
+                <tr><td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-weight: bold; width: 35%; color: #64748b;">Monitor Name</td>
+                    <td style="padding: 10px; border-bottom: 1px solid #e2e8f0;">{monitor.name}</td></tr>
+                <tr><td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-weight: bold; color: #64748b;">Target URL</td>
+                    <td style="padding: 10px; border-bottom: 1px solid #e2e8f0;"><a href="{monitor.url}" style="color: #3b82f6; text-decoration: none;">{monitor.url}</a></td></tr>
+                <tr><td style="padding: 10px; font-weight: bold; color: #64748b;">Timestamp</td>
+                    <td style="padding: 10px;">{time_now}</td></tr>
+            </table>
+        </div>
+        <div style="background-color: #f8fafc; padding: 15px 20px; font-size: 12px; color: #64748b; text-align: center; border-top: 1px solid #e2e8f0;">
+            This is an automated message from Upfield Monitoring System.
+        </div>
+    </div>
+</body>
+</html>"""
     else:
         return
 
@@ -119,13 +184,14 @@ async def notify(monitor, event: str) -> None:
     target_email = monitor.notify_email or app_settings.alert_email
     if target_email and app_settings.smtp_user and app_settings.smtp_pass:
         tasks.append(send_email(
-            target_email, 
-            email_subject, 
-            email_body, 
-            app_settings.smtp_host, 
-            app_settings.smtp_port, 
-            app_settings.smtp_user, 
-            app_settings.smtp_pass
+            to_email=target_email, 
+            subject=email_subject, 
+            text_body=text_body,
+            html_body=html_body, 
+            smtp_host=app_settings.smtp_host, 
+            smtp_port=app_settings.smtp_port, 
+            smtp_user=app_settings.smtp_user, 
+            smtp_pass=app_settings.smtp_pass
         ))
 
     if tasks:
