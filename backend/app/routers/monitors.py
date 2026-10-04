@@ -6,8 +6,13 @@ from ..database import get_db
 from ..models import Monitor
 from ..schemas import MonitorCreate, MonitorUpdate, MonitorResponse
 from ..scheduler import run_check
+from ..auth import get_current_user
 
-router = APIRouter(prefix="/monitors", tags=["Monitors"])
+router = APIRouter(
+    prefix="/monitors", 
+    tags=["Monitors"],
+    dependencies=[Depends(get_current_user)]
+)
 
 
 @router.get("/", response_model=List[MonitorResponse], summary="List all monitors")

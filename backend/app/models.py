@@ -5,6 +5,14 @@ from sqlalchemy.sql import func
 from .database import Base
 
 
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True)
+    hashed_password = Column(String)
+    totp_secret = Column(String, nullable=True)
+    is_totp_enabled = Column(Boolean, default=False)
+
 class Monitor(Base):
     """A URL that should be periodically checked for availability."""
 

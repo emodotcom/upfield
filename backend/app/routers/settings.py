@@ -4,8 +4,13 @@ from sqlalchemy.orm import Session
 from ..database import get_db
 from ..models import AppSettings
 from ..schemas import SettingsUpdate, SettingsResponse
+from ..auth import get_current_user
 
-router = APIRouter(prefix="/settings", tags=["Settings"])
+router = APIRouter(
+    prefix="/settings", 
+    tags=["Settings"],
+    dependencies=[Depends(get_current_user)]
+)
 
 def get_or_create_settings(db: Session) -> AppSettings:
     settings = db.query(AppSettings).first()
