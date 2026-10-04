@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
 import { Lock, User as UserIcon } from "lucide-react";
 import { authApi } from "../api/client";
 import { Button } from "../components/ui/button";
