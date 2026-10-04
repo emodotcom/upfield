@@ -100,7 +100,7 @@ export function Dashboard() {
             size="icon"
             onClick={() => setTheme(theme === "light" ? "dark" : "light")}
             className="rounded-full"
-            title="Temayı Değiştir"
+            title="Toggle Theme"
           >
             {theme === "light" ? <Moon className="h-5 w-5 text-slate-700" /> : <Sun className="h-5 w-5 text-slate-300" />}
           </Button>
@@ -109,7 +109,7 @@ export function Dashboard() {
             size="icon"
             onClick={handleLogout}
             className="rounded-full text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
-            title="Çıkış Yap"
+            title="Logout"
           >
             <LogOut className="h-5 w-5" />
           </Button>

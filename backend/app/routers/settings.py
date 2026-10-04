@@ -41,18 +41,18 @@ def update_settings(payload: SettingsUpdate, db: Session = Depends(get_db)):
 async def test_email(db: Session = Depends(get_db)):
     settings = get_or_create_settings(db)
     if not settings.smtp_host or not settings.smtp_user or not settings.smtp_pass or not settings.alert_email:
-        raise HTTPException(status_code=400, detail="Eksik SMTP ayarları. Lütfen ayarları kaydedip tekrar deneyin.")
+        raise HTTPException(status_code=400, detail="Missing SMTP settings. Please save settings and try again.")
     
     try:
         await send_email(
             to_email=settings.alert_email,
-            subject="🚀 Upfield Bildirim Testi",
-            html_body="<h2>✅ Upfield E-Posta Testi Başarılı!</h2><p>E-posta ayarlarınız doğru şekilde yapılandırılmış. Sistem çöktüğünde e-postalarınız buraya gelecek.</p>",
+            subject="🚀 Upfield Notification Test",
+            html_body="<h2>✅ Upfield Email Test Successful!</h2><p>Your email settings are correctly configured. When the system goes down, emails will arrive here.</p>",
             smtp_host=settings.smtp_host,
             smtp_port=settings.smtp_port,
             smtp_user=settings.smtp_user,
             smtp_pass=settings.smtp_pass
         )
-        return {"status": "success", "message": "Test e-postası başarıyla gönderildi."}
+        return {"status": "success", "message": "Test email sent successfully."}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"E-posta gönderilemedi: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to send email: {str(e)}")

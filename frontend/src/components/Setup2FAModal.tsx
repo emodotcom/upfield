@@ -39,7 +39,7 @@ export function Setup2FAModal() {
       await authApi.enable2FA(code);
       setSuccess(true);
     } catch (err: any) {
-      setError(err.response?.data?.detail || "Geçersiz kod");
+      setError(err.response?.data?.detail || "Invalid code");
     }
   };
 
@@ -47,20 +47,20 @@ export function Setup2FAModal() {
     <Dialog open={open} onOpenChange={handleOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" className="w-full justify-start mt-4 border-indigo-200 dark:border-indigo-900 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20">
-          İki Aşamalı Doğrulamayı (2FA) Aç
+          Enable Two-Factor Auth (2FA)
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Google Authenticator Kurulumu</DialogTitle>
+          <DialogTitle>Google Authenticator Setup</DialogTitle>
           <DialogDescription>
-            Hesabınızı korumak için 2FA'yı etkinleştirin.
+            Enable 2FA to secure your account.
           </DialogDescription>
         </DialogHeader>
 
         {success ? (
           <div className="p-4 bg-green-50 dark:bg-green-900/10 text-green-600 rounded-md text-center">
-            İki aşamalı doğrulama başarıyla aktifleştirildi!
+            Two-factor authentication successfully enabled!
           </div>
         ) : setupData ? (
           <div className="flex flex-col items-center space-y-6 py-4">
@@ -69,7 +69,7 @@ export function Setup2FAModal() {
             </div>
             
             <div className="text-sm text-center text-slate-500">
-              Uygulamanızla yukarıdaki QR kodu okutun veya şu gizli anahtarı manuel olarak girin:
+              Scan the QR code above with your app or enter this secret key manually:
               <br />
               <code className="mt-2 block font-mono bg-slate-100 dark:bg-slate-800 p-2 rounded text-slate-900 dark:text-slate-100">
                 {setupData.secret}
@@ -79,19 +79,19 @@ export function Setup2FAModal() {
             <div className="flex w-full max-w-sm items-center space-x-2">
               <Input
                 type="text"
-                placeholder="6 Haneli Kod"
+                placeholder="6-Digit Code"
                 maxLength={6}
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
                 className="text-center tracking-widest text-lg"
               />
-              <Button onClick={handleVerify}>Doğrula</Button>
+              <Button onClick={handleVerify}>Verify</Button>
             </div>
             
             {error && <div className="text-red-500 text-sm w-full text-center">{error}</div>}
           </div>
         ) : (
-          <div className="py-8 text-center text-slate-500">Yükleniyor...</div>
+          <div className="py-8 text-center text-slate-500">Loading...</div>
         )}
       </DialogContent>
     </Dialog>

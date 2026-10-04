@@ -26,12 +26,12 @@ export function ChangePasswordModal() {
     setSuccess(false);
 
     if (newPassword !== confirmPassword) {
-      setError("Yeni şifreler eşleşmiyor");
+      setError("New passwords do not match");
       return;
     }
 
     if (newPassword.length < 6) {
-      setError("Yeni şifre en az 6 karakter olmalıdır");
+      setError("New password must be at least 6 characters");
       return;
     }
 
@@ -47,7 +47,7 @@ export function ChangePasswordModal() {
         setSuccess(false);
       }, 2000);
     } catch (err: any) {
-      setError(err.response?.data?.detail || "Şifre değiştirilirken bir hata oluştu");
+      setError(err.response?.data?.detail || "An error occurred while changing the password");
     } finally {
       setLoading(false);
     }
@@ -57,27 +57,27 @@ export function ChangePasswordModal() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" className="w-full justify-start mt-2 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800">
-          Şifre Değiştir
+          Change Password
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Şifre Değiştir</DialogTitle>
+          <DialogTitle>Change Password</DialogTitle>
           <DialogDescription>
-            Hesabınızın güvenliği için güçlü bir şifre seçin.
+            Choose a strong password for your account security.
           </DialogDescription>
         </DialogHeader>
 
         {success ? (
           <div className="p-4 bg-green-50 dark:bg-green-900/10 text-green-600 rounded-md text-center border border-green-200 dark:border-green-900/50">
-            Şifreniz başarıyla güncellendi!
+            Your password was successfully updated!
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4 py-4">
             {error && <div className="text-red-500 text-sm">{error}</div>}
             
             <div className="space-y-2">
-              <label className="text-sm font-medium">Mevcut Şifre</label>
+              <label className="text-sm font-medium">Current Password</label>
               <Input
                 type="password"
                 value={currentPassword}
@@ -87,7 +87,7 @@ export function ChangePasswordModal() {
             </div>
             
             <div className="space-y-2">
-              <label className="text-sm font-medium">Yeni Şifre</label>
+              <label className="text-sm font-medium">New Password</label>
               <Input
                 type="password"
                 value={newPassword}
@@ -97,7 +97,7 @@ export function ChangePasswordModal() {
             </div>
             
             <div className="space-y-2">
-              <label className="text-sm font-medium">Yeni Şifre (Tekrar)</label>
+              <label className="text-sm font-medium">Confirm New Password</label>
               <Input
                 type="password"
                 value={confirmPassword}
@@ -107,7 +107,7 @@ export function ChangePasswordModal() {
             </div>
 
             <Button type="submit" className="w-full mt-4" disabled={loading}>
-              {loading ? "Güncelleniyor..." : "Şifreyi Güncelle"}
+              {loading ? "Updating..." : "Update Password"}
             </Button>
           </form>
         )}

@@ -65,9 +65,9 @@ export function SettingsModal() {
       setTestingEmail(true);
       await updateGlobalSettings(formData); // Save first to ensure latest settings are used
       const res = await testEmail();
-      alert(res.message || "Test e-postası başarıyla gönderildi!");
+      alert(res.message || "Test email sent successfully!");
     } catch (err: any) {
-      alert(err.response?.data?.detail || "E-posta gönderimi başarısız oldu.");
+      alert(err.response?.data?.detail || "Email sending failed.");
     } finally {
       setTestingEmail(false);
     }
@@ -170,13 +170,13 @@ export function SettingsModal() {
 
           <div className="flex justify-end space-x-2 pt-4">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-              İptal
+              Cancel
             </Button>
             <Button type="button" variant="secondary" onClick={handleTestEmail} disabled={testingEmail || loading}>
-              {testingEmail ? "Gönderiliyor..." : "E-Posta Test Et"}
+              {testingEmail ? "Sending..." : "Test Email"}
             </Button>
             <Button type="submit" disabled={loading || testingEmail}>
-              {loading ? "Kaydediliyor..." : "Ayarları Kaydet"}
+              {loading ? "Saving..." : "Save Settings"}
             </Button>
           </div>
         </form>
