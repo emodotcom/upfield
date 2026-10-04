@@ -48,16 +48,23 @@ async def send_email(to_email: str, subject: str, html_body: str, smtp_host: str
     msg.attach(MIMEText(html_body, "html"))
 
     try:
+        # Port 465 requires implicit TLS (use_tls=True)
+        # Port 587 requires explicit TLS (start_tls=True)
+        use_tls = (smtp_port == 465)
+        start_tls = (smtp_port != 465)
+
         await aiosmtplib.send(
             msg,
             hostname=smtp_host or "smtp.gmail.com",
             port=smtp_port or 587,
             username=smtp_user,
             password=smtp_pass,
-            start_tls=True,
+            use_tls=use_tls,
+            start_tls=start_tls,
         )
     except Exception as exc:  # noqa: BLE001
         logger.error("Email notification failed: %s", exc)
+        raise exc # Hata yutulmasın, arayüze dönsün
 
 
 # ─── Dispatcher ───────────────────────────────────────────────────────────────
