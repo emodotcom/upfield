@@ -1,9 +1,51 @@
 import axios from "axios";
 import type { Monitor, MonitorCreate, Check, MonitorStats, AppSettings } from "../types";
 
-const api = axios.create({
+export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:8000",
 });
+
+// Interceptor to attach JWT token
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("upfield_token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Interceptor to handle 401 Unauthorized globally
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem("upfield_token");
+      if (window.location.pathname !== "/login") {
+        window.location.href = "/login";
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
+export const authApi = {
+  login: async (data: any) => {
+    const response = await api.post("/auth/login", data);
+    return response.data;
+  },
+  verify2FA: async (data: any) => {
+    const response = await api.post("/auth/verify-2fa", data);
+    return response.data;
+  },
+  setup2FA: async () => {
+    const response = await api.get("/auth/setup-2fa");
+    return response.data;
+  },
+  enable2FA: async (code: string) => {
+    const response = await api.post("/auth/enable-2fa", { code });
+    return response.data;
+  }
+};
 
 export async function fetchMonitors(): Promise<Monitor[]> {
   const { data } = await api.get("/monitors/");

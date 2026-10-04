@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Settings } from "lucide-react";
+import { Setup2FAModal } from "./Setup2FAModal";
 
 export function SettingsModal() {
   const [open, setOpen] = useState(false);
@@ -144,6 +145,11 @@ export function SettingsModal() {
                 onChange={(e) => setFormData({ ...formData, alert_email: e.target.value })}
               />
             </div>
+          </div>
+
+          <div className="space-y-4">
+            <h3 className="text-sm font-medium border-b pb-2">Security</h3>
+            <Setup2FAModal />
           </div>
 
           <div className="flex justify-end space-x-2 pt-4">
