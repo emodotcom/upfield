@@ -67,6 +67,9 @@ export function Login() {
                   <div className="relative">
                     <UserIcon className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
                     <Input 
+                      id="username"
+                      name="username"
+                      autoComplete="username"
                       placeholder="Username" 
                       className="pl-9 bg-slate-50 dark:bg-zinc-950 text-slate-900 dark:text-slate-100 border-slate-200 dark:border-zinc-800"
                       value={username}
@@ -79,6 +82,9 @@ export function Login() {
                   <div className="relative">
                     <Lock className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
                     <Input 
+                      id="password"
+                      name="password"
+                      autoComplete="current-password"
                       type="password"
                       placeholder="Password" 
                       className="pl-9 bg-slate-50 dark:bg-zinc-950 text-slate-900 dark:text-slate-100 border-slate-200 dark:border-zinc-800"
