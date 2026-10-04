@@ -44,6 +44,10 @@ export const authApi = {
   enable2FA: async (code: string) => {
     const response = await api.post("/auth/enable-2fa", { code });
     return response.data;
+  },
+  changePassword: async (data: any) => {
+    const response = await api.put("/auth/change-password", data);
+    return response.data;
   }
 };
 

@@ -4,7 +4,7 @@ import { fetchMonitors, createMonitor, deleteMonitor, triggerCheck, updateMonito
 import { MonitorCard } from "@/components/MonitorCard";
 import { AddMonitorModal } from "@/components/AddMonitorModal";
 import { SettingsModal } from "@/components/SettingsModal";
-import { Activity, Radio, AlertCircle, CheckCircle2, Moon, Sun } from "lucide-react";
+import { Activity, Radio, AlertCircle, CheckCircle2, Moon, Sun, LogOut } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/theme-provider";
@@ -14,6 +14,11 @@ export function Dashboard() {
   const [monitors, setMonitors] = useState<Monitor[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const handleLogout = () => {
+    localStorage.removeItem("upfield_token");
+    window.location.href = "/login";
+  };
 
   const loadMonitors = async () => {
     try {
@@ -84,7 +89,7 @@ export function Dashboard() {
             <Activity className="h-7 w-7" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Upfield</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Upfield</h1>
             <p className="text-muted-foreground text-sm mt-1">Uptime & Health Monitoring</p>
           </div>
         </div>
@@ -95,8 +100,18 @@ export function Dashboard() {
             size="icon"
             onClick={() => setTheme(theme === "light" ? "dark" : "light")}
             className="rounded-full"
+            title="Temayı Değiştir"
           >
-            {theme === "light" ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+            {theme === "light" ? <Moon className="h-5 w-5 text-slate-700" /> : <Sun className="h-5 w-5 text-slate-300" />}
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleLogout}
+            className="rounded-full text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+            title="Çıkış Yap"
+          >
+            <LogOut className="h-5 w-5" />
           </Button>
           <AddMonitorModal onAdd={handleAddMonitor} />
         </div>
